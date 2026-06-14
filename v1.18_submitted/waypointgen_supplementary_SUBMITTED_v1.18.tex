@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage{amsmath,booktabs,hyperref,longtable,amssymb}
+\title{WaypointGen Supplementary Material}\author{Anonymous Authors}\date{}
+\begin{document}\maketitle
+
+\section*{S.1 Independent Compositional Re-Scoring}
+Independent semantic LLM-judge re-score on all GT constraints: 422/713 = 59.2\%
+overall (D1 43.8\%, D2 55.7\%, D3 73.8\%, D4 91.1\%). Different constraint enumeration
+than main Table 3 (713 vs 579); both methodologies reported for transparency.
+
+\section*{S.2 Stage-2 LoRA Adapter}
+Base Qwen2.5-VL-7B = 0\% area-equation validity (train + held-out, n=15+18);
++ Stage-2 LoRA = 86.7\% train / 44.4\% held-out / 63.6\% overall. Validates the
+learned-component design. Caveats: validity = grammar well-formedness (not metric
+grounding); judge accepts LoRA-invented predicate variants; weakest on $\geq$3 simultaneous constraints.
+
+\section*{S.3 Edge Latency on NVIDIA Jetson Thor}
+n=10 cmds spanning L0-L3 on Qwen3.6-35B-A3B: mean 9.4\,s/cmd (med 8.0), decode 35.2 tps,
+output 256 tokens avg, CV $<$0.05 (decode-bound on 122GB unified-memory edge).
+The full per-command breakdown is given in Table~\ref{tab:thor}.
+
+\input{_claude_artifacts/supp_table_thor.tex}
+
+\section*{S.4 Integrity Reconciliation}
+Every headline metric was independently re-derived from the on-disk scored evaluation
+log (\texttt{v15\_gt200\_scored}, $n=200$ pairs). Table~\ref{tab:integrity} lists the
+authoritative values; the per-pair recompute in Table~\ref{tab:perpair} reproduces them
+exactly. Where two enumeration methodologies exist (compositional satisfaction), both are
+reported (main paper vs.\ independent re-judge in S.1) for full transparency.
+
+\input{_claude_artifacts/supp_table_integrity.tex}
+
+\section*{S.5 Per-Pair Evaluation Table}
+Table~\ref{tab:perpair} reports every one of the 200 ground-truth NL$\to$waypoint pairs
+(20 command categories $\times$ 4 detail levels D1--D4), grouped by detail level with a
+per-level subtotal. Structural pass measures whether a well-formed area-equation and
+waypoint sequence were produced; geometric pass measures whether the generated waypoints
+fall inside the target region. The structural--geometric gap (99.0\% vs.\ 39.5\%) and its
+sharp dependence on target-region size (D1 80\% $\to$ D4 6\%) motivate the learned geometry
+encoder discussed in the main paper.
+
+\input{_claude_artifacts/supp_table_perpair.tex}
+
+\section*{S.6 Reproducibility}
+Code + 200-pair eval set + 6-shot ICL bank + raw inference logs released on acceptance.
+Hardware: RTX 5090, NVIDIA GB10, NVIDIA Jetson Thor.
+\end{document}
