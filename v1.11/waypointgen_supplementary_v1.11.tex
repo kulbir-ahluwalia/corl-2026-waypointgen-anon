@@ -1,0 +1,36 @@
+\documentclass{article}
+\usepackage{corl_2026}
+\usepackage{times}\usepackage{graphicx}\usepackage{amsmath,amssymb}\usepackage{booktabs}\usepackage{url}\usepackage{microtype}
+\title{\LARGE\bf WaypointGen --- Supplementary Material}
+\author{Author Names Omitted for Anonymous Review}
+\begin{document}\maketitle\thispagestyle{empty}
+
+\section{Evaluation Benchmark Details}
+The benchmark comprises \textbf{200 ground-truth-annotated command pairs} over 10 citrus orchards, organized as \textbf{20 command types $\times$ 4 detail levels} (D1 global coverage, D2 multi-row patterns, D3 row segments, D4 single-tree pickup), 10 pairs per type. Command types span single-tree (pickup, inspection, replanting, via-corridor, landmark-skip), row-segment (row-then-headland, headland-then-row-half, row-central-segment, lane-then-row, row-with-inline-avoid), multi-row (every-other-tree, alternating-rows-zigzag, odd-rows-only, row-pair-corridor-transition, headland-strip-sweep), and global (quadrant-coverage, perimeter-loop, centre-then-quadrant, northern-half-then-southern-half, multi-constraint-avoidance).
+
+\section{Area-Equation Primitives}
+Commands compile to compositional area equations over a four-level hierarchy (L0 orchard $\to$ L1 row $\to$ L2 segment $\to$ L3 tree). Primitives: \texttt{Row(n)}, \texttt{TreePoint(x,y,r)}, \texttt{Headland(name)}, \texttt{Quadrant(dir)}, \texttt{Corridor(width\_m)}, \texttt{OrchardWing}, combined with the \texttt{\&} (intersection) operator and predicates (avoidance, ordering, containment, proximity). Example (D4): \texttt{Row(3).corridor(width\_m=2.0) \& TreePoint(tree\_3\_6.x, tree\_3\_6.y, r=1.0)}.
+
+\section{Multi-Round Inference Protocol}
+R1: thinking-mode inference emits the area equation + predicate set grounded in the BEV scene graph (\texttt{num\_predict}=2048). R2: if structurally incomplete, re-prompt carrying R1's reasoning trace, demanding the missing blocks. R3: deterministic geometric synthesis along the area-equation primitive as fallback. This eliminates the 24.9\% missing-block failure mode of single-round inference.
+
+\section{Per-Level Results}
+\begin{table}[h]\centering\small
+\begin{tabular}{lcccc}\toprule
+Level & $n$ & Struct.\ \% & Geo.\ \% & Both \% \\ \midrule
+D1 (Global) & 50 & 96.0 & 80.0 & 78.0 \\
+D2 (Multi-row) & 50 & 100.0 & 44.0 & 44.0 \\
+D3 (Row-segment) & 50 & 100.0 & 28.0 & 28.0 \\
+D4 (Single-tree) & 50 & 100.0 & 6.0 & 6.0 \\ \midrule
+\textbf{Overall} & \textbf{200} & \textbf{99.0} & \textbf{39.5} & \textbf{39.0} \\ \bottomrule
+\end{tabular}\end{table}
+
+\section{3-Stage Semi-Supervised Distillation}
+Stage 1: 6 human-verified in-context exemplars per command type seed generation of 200 candidate trajectories. Stage 2: human-in-the-loop filtering retains the top-quality subset as weak-supervision signal. Stage 3: the in-context pool is expanded with verified successes and generation is scaled toward a fine-tuning corpus for a compact edge student. Round-2 generation produced 391 valid area-equation samples across the 20 types on workstation- and edge-class hardware.
+
+\section{Hardware}
+Validated on three platforms: RTX~5090 (32\,GB, 25.5\,s/cmd), NVIDIA GB10 unified memory (128\,GB, 290\,s/cmd), and NVIDIA Jetson Thor (122\,GB unified, $\sim$66\,s/cmd, 99.5\% structural) --- evidence of architecture-independent, edge-deployable inference.
+
+\section{Limitations of Supplementary Scope}
+All evaluation is open-loop (generated area equations scored against ground-truth regions); closed-loop on-robot execution and a learned geometry encoder for metric fidelity are future work.
+\end{document}

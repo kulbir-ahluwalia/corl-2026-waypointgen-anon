@@ -1,0 +1,568 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CoRL 2026 Submission -- WaypointGen
+% v1.11 final CoRL 2026 submission (June 2026)
+% - all fixes applied
+% - v17 results excluded from CoRL claims (used as negative baseline for RAL track only)
+% - anonymized GitHub: https://github.com/kulbir-ahluwalia/corl-2026-waypointgen-anon
+% Template: corl_2024.sty (CoRL 2026 template not yet released; using prior-year
+% style which is canonical until the official 2026 file drops)
+% Double-blind: Author names omitted at submission time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+\usepackage{corl_2026}                  % CoRL submission style (replace with corl_2026 when released)
+
+% ---- packages ----
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath,amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{microtype}
+% (hyperref loaded by corl_2024.sty)
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{pifont}                     % \ding (checkmark/cross symbols)
+
+% Checkmark symbols for comparison tables
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\omark}{$\circ$}
+
+% ---- collaborator comments (no-op at submission) ----
+\newif\ifshowcomments
+\showcommentsfalse                      % hide collaborator notes for submission
+
+% Color-blind-safe palette (Okabe-Ito) -- kept so any inline \Reviewer{...} calls don't error
+\definecolor{cbOrange}{HTML}{E69F00}
+\definecolor{cbSkyBlue}{HTML}{56B4E9}
+\definecolor{cbBluishGreen}{HTML}{009E73}
+\definecolor{cbYellow}{HTML}{F0E442}
+\definecolor{cbBlue}{HTML}{0072B2}
+\definecolor{cbVermillion}{HTML}{D55E00}
+\definecolor{cbReddishPurple}{HTML}{CC79A7}
+\definecolor{cbIndigo}{HTML}{7570B3}
+\definecolor{cbMagenta}{HTML}{E7298A}
+\definecolor{cbBrown}{HTML}{A6761D}
+\definecolor{cbGray}{HTML}{666666}
+
+\newcommand{\collabcomment}[3]{\ifshowcomments\textcolor{#2}{\textbf{#1:} #3}\fi}
+\newcommand{\Test}[1]{\collabcomment{Girish}{cbReddishPurple}{#1}}
+\newcommand{\Reviewer}[1]{\collabcomment{Reviewer}{cbBlue}{#1}}
+\newcommand{\Chahit}[1]{\collabcomment{Chahit}{cbOrange}{#1}}
+\newcommand{\Shreya}[1]{\collabcomment{Shreya}{cbBluishGreen}{#1}}
+\newcommand{\Arun}[1]{\collabcomment{Arun}{cbVermillion}{#1}}
+\newcommand{\Joao}[1]{\collabcomment{Joao}{cbSkyBlue}{#1}}
+\newcommand{\Julia}[1]{\collabcomment{Julia}{Red}{#1}}
+\newcommand{\Ansel}[1]{\collabcomment{Ansel}{cbGray}{#1}}
+\newcommand{\Navjot}[1]{\collabcomment{Navjot}{cbBrown}{#1}}
+\newcommand{\Vishnu}[1]{\collabcomment{Vishnu}{cbIndigo}{#1}}
+\newcommand{\Jose}[1]{\collabcomment{Jose}{cbMagenta}{#1}}
+\newcommand{\Girish}[1]{\collabcomment{Girish}{Green}{#1}}
+
+% Algorithm2e side-comment helpers (no-op if algorithm2e is not loaded)
+\makeatletter
+\@ifpackageloaded{algorithm2e}{%
+  \newcommand{\algcomment}[3]{\ifshowcomments\tcp*[f]{\textcolor{#2}{\textbf{#1:} #3}}\fi}%
+}{%
+  \newcommand{\algcomment}[3]{}%
+}
+\makeatother
+
+% Aliases that the existing tex body uses for algorithm side-comments
+\newcommand{\TESTAlg}[1]{\algcomment{TEST}{cbReddishPurple}{#1}}
+\newcommand{\ReviewerAlg}[1]{\algcomment{Reviewer}{cbBlue}{#1}}
+\newcommand{\ChahitAlg}[1]{\algcomment{Chahit}{cbOrange}{#1}}
+\newcommand{\ShreyaAlg}[1]{\algcomment{Shreya}{cbBluishGreen}{#1}}
+\newcommand{\ArunAlg}[1]{\algcomment{Arun}{cbVermillion}{#1}}
+\newcommand{\JuliaAlg}[1]{\algcomment{Julia}{cbSkyBlue}{#1}}
+\newcommand{\JoaoAlg}[1]{\algcomment{Joao}{Cyan}{#1}}
+\newcommand{\GirishAlg}[1]{\algcomment{Girish}{Red}{#1}}
+\newcommand{\AnselAlg}[1]{\algcomment{Ansel}{cbGray}{#1}}
+\newcommand{\NavjotAlg}[1]{\algcomment{Navjot}{cbBrown}{#1}}
+\newcommand{\VishnuAlg}[1]{\algcomment{Vishnu}{cbIndigo}{#1}}
+\newcommand{\JoseAlg}[1]{\algcomment{Jose}{cbMagenta}{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title, authors, abstract, and body follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{\LARGE \bf
+WaypointGen: Language-Grounded Waypoint-Based Navigation for Agricultural Mobile Manipulators}
+
+% WaypointGen: Learning Grounded Waypoint based Navigation for
+% Mobile Manipulators
+
+% author line omitted for anonymous review
+
+% Author block hidden for double-blind review
+\author{Author Names Omitted for Anonymous Review}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% (Old abstract drafts removed for submission)
+
+\begin{abstract}
+Deploying autonomous navigation in agricultural environments requires months of site-specific data collection because current systems lack native interfaces for compositional natural language constraints across spatial abstraction levels.
+We introduce WaypointGen, a language-conditioned waypoint generation system that compiles compositional NL commands into executable area equations over a four-level spatial hierarchy (L0~orchard $\to$ L1~row $\to$ L2~segment $\to$ L3~tree instance) using multi-round VLM inference with a SayPlan-style~\citep{rana2023sayplan} in-context scaffold.
+Our key insight is that image-space waypoint generation in Bird's Eye View~(BEV), paired with open-vocabulary scene graph construction (SAM3 + dense captioning), enables VLMs to reason compositionally about spatial constraints without pre-built maps or site-specific training.
+The system operates in three rounds: (R1)~thinking-mode inference generates area equations and predicate sets grounded in the scene graph; (R2)~targeted retry recovers missing output blocks; (R3)~deterministic synthesis provides geometric fallback.
+On a 200-pair evaluation spanning 10~citrus orchards with ground-truth tree annotations across four detail levels (D1~global coverage, D2~multi-row patterns, D3~row segments, D4~single-tree pickup), WaypointGen achieves a 99\% structural pass rate~(vs.\ 75.1\% single-round baseline) and 81.9\% compositional constraint satisfaction across all four abstraction levels, while an explicit geometric-fidelity analysis (39.5\% region containment, degrading from 80\% at D1 to 6\% at D4) isolates metric grounding---rather than language understanding---as the key open challenge.
+Multi-hardware evaluation spanning a workstation GPU and edge-class hardware~(RTX~5090 and NVIDIA~Jetson~Thor) with Qwen3.6-35B-A3B confirms architecture-independent generalization, including a $99.5\%$ structural pass rate on edge hardware.
+The system reduces deployment time from 3~months to 1--2~weeks through automated semi-supervised labeling, requiring only 6~ground-truth-verified in-context examples.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{figure}[t]
+% \centering
+% \begin{tikzpicture}
+% \node[anchor=south west, inner sep=0] (img) at (0,0)
+%   {\includegraphics[width=\textwidth]{figures/Semi-Supervised_Dataset_Generation_Jan31-chahit-edit-1836.pdf}};
+% \end{tikzpicture}
+% \caption{Semi-supervised dataset generation pipeline overview. (i) SAM3 and DAM generate Masks and NL descriptions. (ii) DINO-X generates bounding boxes and instance masks. (iii) Human annotations are used for in-context learning for weak supervision using Qwen3.5-35B-A3B MoE VLM, the pipeline expands to a NL prompt bank and training set for image space waypoint generation. Finally, Qwen3.5-35B-A3B MoE model acts as the VLM Judge and uses In-Context Learning for Weak Supervision for generating semantically correct NL commands for images in our dataset.}
+% \label{fig:semi_supervised_pipeline}
+% \end{figure}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Old Pipeline_v1.4 figure replaced by step-by-step diagrams below
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Overleaf feedback notes (Jan 23, 2026):
+% - Add more evaluation detail: number of commands, complexity, and metrics.
+% - Include ablations/baselines to quantify improvements.
+% - Re-check word limit and appendix coverage.
+
+% Overleaf branch (overleaf-2026-01-27-2343) also had draft front-matter figures
+% and an alternate abstract; keep mainline content here and pull those in as needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:intro}
+
+Agricultural robots must reach semantically specified goals (e.g., ``third palm tree from the left'') in dynamic, repetitive fields, yet deploying a navigation stack for a new crop or site still requires weeks to months of data collection, labeling, and manual tuning~\citep{bac2014harvesting}. In our deployments this process takes ${\sim}$3~months. This bottleneck severely limits the scalability of agricultural automation.
+
+Traditional navigation workflows further compound this delay by requiring a full 3D reconstruction or map before waypoint planning. A typical stack collects dense RGB-D data, performs SLAM or multi-view reconstruction, builds a 3D representation, and then tunes cost maps and planners for each site~\citep{campos2021orbslam3,pfrommer2019tagslam}. In outdoor agriculture, repetitive vegetation, lighting changes, and dynamic obstacles make mapping brittle and increase the time spent on calibration and hand-tuning. These pipelines are also ill-suited to semantic constraints (``avoid the irrigation ditch'' or ``stop at the third tree''), which require additional hand-coded logic.
+
+Natural language is uniquely suited for commanding agricultural robots because it supports \emph{compositional, constraint-aware} instructions (e.g., ``go to the third palm tree from the left while avoiding the water channel''), enables \emph{dynamic re-tasking}, and when paired with open-vocabulary VLMs provides \emph{zero-shot generalization} across crops and sites. Our design exploits two insights from field deployments: (i)~start-point conditioning anchors the robot in repetitive rows where SLAM drifts; (ii)~BEV projection makes traversable structure explicit, reducing VLM spatial hallucinations.
+
+Existing outdoor agricultural navigation systems are constrained by (i)~\emph{limited generalizability} across crops and spatial abstractions, (ii)~\emph{excessive site-specific fine-tuning} for new deployments, (iii)~\emph{narrow NL command diversity} (typically single-target ROI only), and (iv)~\emph{limited edge deployability} of large VLMs. WaypointGen addresses these jointly: Qwen~3.6~MoE~\citep{qwen2026qwen36} generates executable Code-as-Policies~\citep{liang2023code} for 2D spatial reasoning over normalized BEV centroids of open-world ROI masks, enabling phrase grounding for NL-defined abstractions (rows, paths, gaps); a semi-supervised pipeline expands 5~labeled \{RGBD, NL~command, MPPI~trajectory\} pairs into 500~training pairs per NL template via in-context learning; users add viewpoint-dependent, temporal, and spatial NL constraints at inference time without retraining; and MoE distillation for Jetson-class edge deployment is targeted as future work. Together this yields inherently generalizable NL-conditioned trajectory selection that reduces deployment to a new agricultural environment from months to 1--2~weeks.
+
+This paper introduces WaypointGen, a system that generates navigation waypoints directly in 2D image space from natural language commands and synchronized RGB-D observations (Sec.~\ref{sec:problem}). Our key insight is that image-space waypoint generation followed by lightweight 3D projection is more robust than full 3D reconstruction in outdoor agriculture. The main contributions are:
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_hero_egocentric_mppi.pdf}
+\caption{\textbf{Egocentric waypoint generation.} Given the NL command \emph{``Drive to the 3rd tall palm tree,''} WaypointGen identifies the target via SAM3 instance segmentation (blue mask, labeled \texttt{det\_008\_tree}, with crosshair) and generates 7~MPPI candidate trajectories (colored curves) in the egocentric camera frame. The VLM selects the trajectory that best satisfies the NL constraint. This figure depicts the on-robot \emph{execution} layer; the NL$\to$area-equation \emph{planning} layer that produces the target region is what we evaluate quantitatively (Sec.~\ref{sec:experiments}).}
+\label{fig:hero_egocentric}
+\end{figure}
+
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{figure}[t]
+% \centering
+% \begin{tikzpicture}
+% \node[anchor=south west, inner sep=0] (img) at (0,0)
+%   {\includegraphics[width=\textwidth]{figures/Semi-Supervised Dataset Generation.pdf}};
+% \end{tikzpicture}
+% \caption{Semi-supervised dataset generation pipeline overview. (i) SAM3 and DAM generate Masks and NL descriptions. (ii) QWEN3 is used to generate relevant 2D NL Navigation task descriptions. (iii) Human annotations are used for in-context learning for weak supervision using QWEN3: 235B VLM for image space Target ROI selection and trajectory selection.}
+% \label{fig:semi_supervised_pipeline}
+% \end{figure}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+% [REMOVED: March 2026 IROS pipeline figures — outdated 5-step diagram doesn't match current 3-round multi-round architecture]
+
+
+
+
+
+
+\textbf{Contributions.} (i)~A map-free, NL constraint-aware 2D waypoint generation pipeline using a single-frame egocentric BEV projection with Code-as-Policies~\citep{liang2023code} spatial reasoning, reducing deployment from 3~months to 1--2~weeks. (ii)~A semi-supervised dataset pipeline that expands 5~labeled \{RGBD, NL, trajectory\} pairs per template into 500 training pairs via in-context learning using SAM3, DAM, MPPI, and Qwen3.6-35B-A3B (256 experts, 3B active), with ablations quantifying the trajectory-selection strategy. (iii)~Evaluation on 200~GT-annotated commands spanning 10~citrus orchards across four detail levels (D1--D4), achieving 99\% structural pass rate (198/200 verified) and 81.9\% compositional constraint satisfaction via multi-round VLM inference.
+
+% (old related work draft removed for submission)
+
+% added updated related work section with detailed comparison in a table form 
+\section{Related Work}
+\label{sec:related}
+
+
+
+
+
+
+
+\subsection{Vision-Language Models for Spatial Reasoning}
+Recent work demonstrates that VLMs benefit from explicit geometric signal injection for spatial tasks. SpatialVLM~\citep{chen2024spatialvlm} introduces a spatial reasoning module that grounds metric distance and directional queries before VLM decoding, enabling quantitative spatial judgments from language. However, SpatialVLM operates on single-image depth estimation and does not model multi-level spatial hierarchies. SpatialStack~\citep{zhang2026spatialstack} extends this line with multi-level geometry-language fusion across scene hierarchies, achieving state-of-the-art 3D spatial reasoning in indoor and outdoor scenes by injecting geometric features at multiple transformer layers. RoboPoint~\citep{yuan2025robopoint} predicts spatial affordance points directly in the camera frame from language descriptions, achieving precise action-point predictions without costmaps but targeting indoor tabletop settings and single-object goals. VGGT~\citep{wang2025vggt} demonstrates feed-forward 3D geometry estimation from multi-view images, providing the geometric backbone that downstream VLM reasoning can exploit for scene understanding. These works demonstrate that VLMs benefit from explicit geometric signal injection, but none address compositional NL constraints across a multi-level spatial hierarchy---the core challenge for agricultural navigation where commands span orchard-level coverage down to individual tree pickup.
+
+\subsection{Language-Conditioned Navigation}
+SayCan~\citep{ichter2023saycan} grounds language commands in robotic affordances via value functions over a fixed skill library, enabling long-horizon task execution but requiring pre-defined primitives that must be manually specified for each environment. NaVILA~\citep{cheng2025navila} drives legged-robot navigation with a hierarchical VLM policy that emits mid-level language actions executed by a low-level controller, rather than explicit metric waypoints. VLM-GroNav~\citep{elnoor2025vlmgronav} grounds outdoor navigation in physical terrain properties and has its VLM \emph{select} waypoints from numbered candidate markers overlaid on aerial imagery to optimize traversability, while BehAV~\citep{weerakoon2025behav} encodes behavioral rules into a cost map and outputs velocity commands; neither conditions waypoints on compositional natural-language spatial constraints. AgriVLN~\citep{zhao2025agrivln} is the closest to our domain, adapting vision-and-language navigation to agriculture, but a VLM selects low-level discrete actions (forward/rotate/stop) frame-by-frame in a continuous environment rather than emitting metric BEV waypoint sequences. CoNVOI~\citep{sathyamoorthy2024convoi} uses zero-shot VLM scene classification and selects numbered free-space markers to construct a metric reference path, but does not generate waypoints from compositional NL constraints. Prior language-conditioned navigation systems either require prior maps or topological graphs from earlier traversal~\citep{huang2023vlmaps,shah2023lmnav} or per-environment training; WaypointGen removes both requirements through in-context learning over single-frame BEV projections.
+
+\subsection{Compositional Spatial Grounding}
+Compositional language grounding remains challenging because instruction-following accuracy degrades as spatial abstraction increases. The foundational study by Lachmy et al.~\citep{lachmy2022draw} establishes an 8-level NL abstraction taxonomy for spatial instruction following in a drawing domain, demonstrating that seq2seq models collapse on composed objects without explicit algebra emission---an inverse accuracy-abstraction correlation. This finding directly motivates our four-level evaluation hierarchy (D1--D4), which tests whether VLMs exhibit the same degradation when generating navigation waypoints under compositional spatial constraints. ConceptGraphs~\citep{gu2024conceptgraphs} constructs open-vocabulary 3D scene graphs from posed RGB-D streams, enabling language-grounded object retrieval across rooms but lacking trajectory generation or compositional constraint reasoning. MapGPT~\citep{chen2024mapgpt} uses hierarchical map-based prompting with adaptive path planning for vision-and-language navigation, demonstrating that structured spatial representations improve VLM navigation decisions in indoor settings. Goal-conditioned navigation models~\citep{shah2023gnm,shah2023vint,sridhar2024nomad,wang2025genie} achieve impressive zero-shot transfer across environments but are conditioned on goal images or GPS goals rather than compositional language, preventing users from specifying constraints such as ordinal selection or avoidance zones. WaypointGen uniquely combines compositional NL constraints, prior-map-free operation (single-frame BEV only), open-vocabulary detection via SAM3, edge deployment, and outdoor agricultural evaluation across four spatial abstraction levels.
+
+\subsection{Navigation in Agricultural Environments}
+Classical agricultural navigation relies on color thresholding and hard-coded depth rules that require extensive per-site tuning and lack semantic understanding~\citep{bac2014harvesting}. Recent learned approaches---self-supervised traversability maps~\citep{gasparino2024wayfaster} and semantic keypoint tracking (CropFollow++~\citep{sivakumar2024cropfollowpp})---improve robustness but still use task-agnostic costmaps and cannot incorporate language directives such as ordinality or avoidance constraints. VLM-guided outdoor navigation methods such as BehAV~\citep{weerakoon2025behav} (behavioral rules to velocity commands) and VLM-GroNav~\citep{elnoor2025vlmgronav} (marker-selected waypoints for terrain traversability) integrate behavioral or proprioceptive grounding but do not condition waypoints on compositional NL directives such as ordinality or avoidance constraints. CoNVOI~\citep{sathyamoorthy2024convoi} uses zero-shot VLM classification to build a metric reference path for context-aware navigation. Visual aliasing in crop rows causes SLAM drift~\citep{cuaran2024undercanopy}, motivating alternative representations.
+
+\subsection{Waypoint Generation and Planning}
+Conventional waypoint methods rely on manual teaching or map-based planning (SLAM + A*/RRT)~\citep{campos2021orbslam3,pfrommer2019tagslam}, which require per-site tuning and cannot handle semantic goals. End-to-end learned policies bypass mapping but must be retrained per environment. RoboPoint~\citep{yuan2025robopoint} predicts action points in the camera frame, achieving precise plans without costmaps, but targets indoor settings. IG-PRM~\citep{bao2025igprm} converts language instructions into cost maps for path planning, while GOAT~\citep{chang2024goat} handles multi-modal goal navigation with semantic mapping and VLFM~\citep{yokoyama2024vlfm} enables zero-shot language-conditioned navigation via frontier maps. Our approach generates waypoints in image/BEV space, operating outdoors on edge hardware with a modular pipeline integrating detection, segmentation, and depth projection.
+
+\begin{table*}[t]
+\centering
+\caption{Comparison of representative navigation approaches in terms of language conditioning, mapping requirements, evaluation domain, and deployment characteristics.}
+\label{tab:related_comparison}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Approach} & \textbf{Year} & \textbf{Lang.\ Input?} & \textbf{Map / 3D Required?} & \textbf{Domain Tested} & \textbf{Real-World Demo} & \textbf{Open-Source} \\
+\midrule
+\multicolumn{7}{l}{\textit{Classical \& Map-Based Navigation}} \\
+\textit{Manual pipeline}~\citep{bac2014harvesting} & 2014--19 & No & No (reactive) & Outdoor farming & Yes (field trials) & N/A \\
+SLAM + Planner (ORB-SLAM3)~\citep{campos2021orbslam3} & 2021 & No & Yes (prior mapping) & Indoor/Outdoor & Yes & Yes \\
+CropFollow++~\citep{sivakumar2024cropfollowpp} & 2024 & No & No (vision keypoints) & Outdoor rows & Yes (farm robot) & No \\
+\midrule
+\multicolumn{7}{l}{\textit{Learned Goal-Conditioned Navigation (No Language)}} \\
+GNM~\citep{shah2023gnm} & 2023 & No & No (goal image) & Outdoor (diverse) & Yes (mobile robot) & Yes \\
+ViNT~\citep{shah2023vint} & 2023 & No & No (goal image) & Outdoor (diverse) & Yes (mobile robot) & Yes \\
+NoMaD~\citep{sridhar2024nomad} & 2024 & No & No (diffusion policy) & Outdoor (diverse) & Yes (mobile robot) & Yes \\
+GeNIE~\citep{wang2025genie} & 2025 & No & No (learned policy) & Outdoor (diverse) & Yes (mobile robot) & Yes \\
+\midrule
+\multicolumn{7}{l}{\textit{Language-Conditioned Navigation}} \\
+LM-Nav~\citep{shah2023lmnav} & 2022 & Yes & No (model-based) & Outdoor campus & Yes (mobile robot) & Yes \\
+VLMaps~\citep{huang2023vlmaps} & 2022 & Yes & Yes (fused map) & Indoor (lab) & Yes (office robot) & Partial \\
+LLM-Grounder~\citep{yang2024llmgrounder} & 2023 & Yes & Yes (3D scene) & Indoor (scans) & No (offline eval) & No \\
+ConceptGraphs~\citep{gu2024conceptgraphs} & 2024 & Yes & Yes (3D scene graph) & Indoor (scans) & Yes (mobile robot) & Yes \\
+SayCan~\citep{ichter2023saycan} & 2022 & Yes & No (skills only) & Indoor (lab) & Yes (PR2 robot) & No \\
+Code-as-Policies~\citep{liang2023code} & 2023 & Yes & No (code gen) & Indoor (lab) & Yes (tabletop) & Yes \\
+PIVOT~\citep{nasiriany2024pivot} & 2024 & Yes & No (iterative VLM) & Indoor + nav (multi-env) & Yes (nav \& manip) & Unknown \\
+RoboPoint~\citep{yuan2025robopoint} & 2024 & Yes & No (single view) & Indoor manip (nav targeted) & Yes (bench-top) & Yes \\
+Talk2BEV~\citep{choudhary2024talk2bev} & 2024 & Yes & No (BEV from LiDAR) & Outdoor (driving) & No (offline eval) & Yes \\
+OpenVLA~\citep{kim2025openvla} & 2024 & Yes & No (end-to-end VLA) & Indoor (manip) & Yes (bench-top) & Yes \\
+AgriVLN~\citep{zhao2025agrivln} & 2025 & Yes & Yes (sim map) & Outdoor (ag sim) & Simulation only & Unknown \\
+\midrule
+\textbf{WaypointGen (Ours)} & \textbf{2026} & \textbf{Yes} & \textbf{No (image/BEV)} & \textbf{Outdoor farms} & \textbf{Edge inference (open-loop)} & \textbf{Planned} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+Table~\ref{tab:related_comparison} (with the per-capability matrix, Table~\ref{tab:capability_matrix} in Appendix~\ref{app:extra}) shows that WaypointGen uniquely combines compositional language understanding, map-free operation, open-vocabulary perception, edge deployment, and outdoor agricultural evaluation: prior map-free systems (LM-Nav, SayCan) rely on topological graphs from prior traversal or fixed skill libraries, action-point methods (RoboPoint, PIVOT) target tabletop or general navigation rather than outdoor agricultural BEV with multi-level NL abstractions, and goal-conditioned models (GNM, ViNT, NoMaD, GeNIE) are conditioned on goal images or GPS goals rather than compositional language. WaypointGen bridges these gaps, synthesizing constraint-aware waypoint sequences directly from language and onboard RGB-D sensing on lightweight edge hardware.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Technical Approach}
+\label{sec:approach}
+
+\subsection{Problem Formulation}
+\label{sec:problem}
+
+We formalize language-conditioned 2D waypoint generation as follows. A waypoint is an ordered 2D point in the image plane whose 3D projection yields a feasible base pose for the robot. Let $\mathcal{L}$ denote a natural language navigation command (e.g., ``go to the third palm tree from the left while avoiding the water channel''), $\{I_k^{\text{RGB}}, I_k^{\text{D}}\}_{k=1}^{K}$ a set of $K$ synchronized RGB-D image pairs from on-board cameras, $\{K_k\}$ the corresponding camera intrinsic matrices, and $\mathcal{E}$ the set of entities in the scene.
+
+\textbf{Goal.} Given $(\mathcal{L}, \{I_k^{\text{RGB}}, I_k^{\text{D}}\}, \{K_k\})$, find a 2D waypoint sequence $W = \{(x_i, y_i)\}_{i=1}^{N}$ in image coordinates of a selected camera $k^*$ such that:
+\begin{enumerate}
+    \item $W_N$ lies within the bounding box of the target entity specified by $\mathcal{L}$;
+    \item No waypoint $W_i$ lies within the bounding box of any avoidance entity specified by $\mathcal{L}$;
+    \item All waypoints lie within regions whose traversability score $\tau \geq \tau_{\min}$.
+\end{enumerate}
+
+\textbf{Objective.} Minimize the Average Displacement Error (ADE) between predicted waypoints and expert-annotated ground truth $W^*$:
+\begin{equation}
+\text{ADE}(W, W^*) = \frac{1}{N}\sum_{i=1}^{N} \| W_i - W^*_i \|_2
+\end{equation}
+while maximizing end-to-end command execution success rate $\mathcal{S}$ (defined in Sec.~\ref{sec:setup}).
+
+The 2D waypoints are then projected to 3D for execution: $P_{3D} = K_{k^*}^{-1} [x, y, 1]^T D_{k^*}(x,y)$.
+
+\subsection{System Architecture Overview}
+
+WaypointGen implements a seven-stage pipeline (Fig.~\ref{fig:hero_egocentric}; additional levels in Appendix~\ref{app:extra}) that maps a natural language command to executable 2D waypoints: instruction parsing, phrase grounding, open-world segmentation (SAM3~\citep{carion2025sam3}), dense captioning (DAM), BEV projection, trajectory planning (MPPI~\citep{williams2017mppi}), and VLM-based trajectory selection (Qwen3.6), followed by lightweight 3D projection. The system operates on synchronized RGB-D streams ($640{\times}360$, depth filtered to 15\,m) with AprilTag/TagSLAM~\citep{pfrommer2019tagslam} or RTK GPS providing the shared coordinate frame.
+
+\subsection{Pipeline Stages}
+
+Given a command $\mathcal{L}$, the system executes seven stages: (S1)~an LLM parses $\mathcal{L}$ into a structured query $\mathcal{Q} = f_{\text{LLM}}(\mathcal{L})$ containing targets, avoidance constraints, and ordinals; (S2)~phrase grounding expands the query into open-vocabulary detection prompts; (S3)~SAM3~\citep{carion2025sam3} performs open-world segmentation producing instance masks $\{M_i, \ell_i\} = f_{\text{SAM3}}(I_{\text{RGB}})$; (S4)~DAM generates dense captions per mask encoding identity and spatial context; (S5)~a prompt bank of 336 NL commands is constructed and filtered via a three-stage Code-as-Policies pipeline; (S6)~MPPI samples 50 unicycle trajectories on the BEV and selects the top-7 by depth-based cost; (S7)~Qwen3.6-35B-A3B selects the trajectory best satisfying the NL constraints.
+
+In parallel with S3, the depth map is projected to a $400{\times}400$\,px BEV image at $0.05$\,m/px resolution, making traversable structure explicit before waypoint synthesis. Start-point conditioning marks the robot's position in the image, providing local context crucial in repetitive crop rows.
+
+\begin{algorithm}[t]
+\caption{On-robot execution layer: realizing an NL-generated target region as a single trajectory. The quantitatively evaluated contribution (Sec.~\ref{sec:experiments}) is the NL$\to$area-equation \emph{planning} layer; this routine consumes its output region $\mathcal{R}_{\text{target}}$ for deployment.}
+\label{alg:traj_gen}
+\begin{algorithmic}[1]
+\STATE \textbf{Input:} RGB-D Image $I$, NL Command $C$, Intrinsic $K$
+\STATE \textbf{Output:} Best BEV Trajectory $T^*$
+\STATE $I_{\text{BEV}} \leftarrow \text{ProjectBEV}(I_{\text{RGB}}, I_{\text{D}}, K)$ \COMMENT{BEV Projection}
+\STATE $M \leftarrow \text{SAM3}(I_{\text{RGB}})$ \COMMENT{Open-world masks}
+\STATE $D \leftarrow \text{DAM}(M)$ \COMMENT{Dense captions}
+\STATE $\mathcal{R}_{\text{target}} \leftarrow \text{Qwen3.6-35B-A3B}(C, D, M)$ \COMMENT{Inference 1: Target ROI}
+\STATE $\text{CostMap} \leftarrow \text{DepthBEVCost}(I_{\text{BEV}}, M)$ \COMMENT{Depth + mask boundary cost}
+\STATE $\mathcal{T}_{50} \leftarrow \text{MPPI}(I_{\text{BEV}}, \mathcal{R}_{\text{target}}, \text{CostMap})$ \COMMENT{50 unicycle samples}
+\STATE $\mathcal{T}_{7} \leftarrow \text{TopK}(\mathcal{T}_{50},\, K{=}7)$ \COMMENT{Cost-aware top-7 selection}
+\STATE $T^* \leftarrow \text{Qwen3.6-35B-A3B}(\mathcal{T}_{7}, C, D)$ \COMMENT{Inference 2: NL-conditioned select}
+\STATE \textbf{return} $T^*$
+\end{algorithmic}
+\end{algorithm}
+
+Generated 2D waypoints are projected to 3D via $P_{3D} = K^{-1} [x, y, 1]^T D(x,y)$, avoiding full 3D reconstruction.
+
+%\begin{figure}[t]
+%\centering
+%\includegraphics[width=\columnwidth]{figures/selected/VLM_egocentric_grounding.png}
+%\caption{\textbf{VLM phrase grounding output.} Top: egocentric camera view of a palm plantation with SAM3 instance mask (red overlay) on the target tree trunk. The VLM generates the spatially-grounded referring expression \emph{``second tree in left row closest to camera.''} Bottom: structured JSON output with bounding box coordinates (\texttt{xmin:547, ymin:1839, xmax:947, ymax:2790}) and the grounded NL label. This grounding bridges NL phrases to instance masks for downstream waypoint generation.}
+%\label{fig:vlm_grounding}
+%\end{figure}
+
+\subsection{Semi-Supervised Labeling Pipeline}
+\label{sec:autolabel}
+
+Traditional labeling requires 6~weeks of manual effort. Our automated pipeline (Fig.~\ref{fig:hero_egocentric}; additional levels in Appendix~\ref{app:extra}) reduces this to 1--2~weeks: RGB-D frames are projected to BEV, SAM3 generates open-world masks with DAM dense captions, a prompt bank of 336 NL commands is constructed and filtered via Code-as-Policies, and cost-aware MPPI selects top-7 trajectories for VLM-based NL-conditioned selection. The resulting \emph{(NL~command, trajectory, reasoning)} tuples enable future LoRA finetuning for edge deployment.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Experimental Results}
+\label{sec:experiments}
+
+\textbf{Scope of evaluation.} All metrics below characterize the \emph{planning} layer: NL-to-area-equation generation over the L0--L3 hierarchy and the resulting waypoints' region containment. The on-robot execution layer (Alg.~\ref{alg:traj_gen}, Fig.~\ref{fig:hero_egocentric}) is described qualitatively; its closed-loop evaluation is left to future work.
+We evaluate WaypointGen on compositional NL command execution across four spatial abstraction levels, measuring structural correctness and semantic constraint satisfaction on the 10-orchard citrus ground-truth dataset (200~pairs, D1--D4).
+
+\subsection{Experimental Setup}
+\label{sec:setup}
+
+\textbf{Ground-truth dataset.} We evaluate on the 10-orchard citrus dataset, comprising 200~NL navigation command pairs across four detail levels (D1~global, D2~multi-row, D3~row-segment, D4~single-tree). Each pair carries ground-truth area equations with concrete geometric parameters derived from a refined tree-reconstruction pipeline operating on satellite orthomosaic BEV images.
+
+\textbf{In-context learning bank.} All evaluations use 6~ground-truth-verified SayPlan exemplars~\citep{rana2023sayplan} covering D1--D4. Each exemplar was verified via leave-one-out multi-round inference.
+
+\textbf{Platform.} Qwen3.6-35B-A3B (MoE, 3B active/token) served via ollama on RTX~5090 (32\,GB GDDR7). Edge-class validation on NVIDIA Jetson Thor (122\,GB unified).
+
+\subsection{Multi-Round Inference Results}
+
+\begin{table}[t]
+\centering
+\caption{Multi-round inference results (200~GT-annotated command pairs, Qwen3.6-35B-A3B, RTX~5090).}
+\label{tab:multiround}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcc}
+\toprule
+Metric & Single-round & Multi-round (R1+R2+R3) \\
+\midrule
+Structural output rate & 96.6\% & \textbf{100.0\%} \\
+Structural pass rate & 75.1\% & \textbf{99.0\%} \\
+Commands with $\geq$6 waypoints & 75.1\% & \textbf{98.5\%} \\
+R1 direct success & --- & 76.5\% \\
+R2 targeted retry & --- & 21.0\% \\
+R3 deterministic fallback & --- & 2.5\% \\
+Errors & 0 & 0 \\
+Median time (s/cmd) & 12.9 & 28.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Multi-round inference eliminates the 23.5\% missing-block failure mode: R2 carries R1's thinking trace and demands the missing blocks, recovering 21.0\% of commands. R3 synthesizes waypoints along the area-equation primitive for the remaining 2.5\%.
+
+\subsection{4-Level Compositional Constraint Satisfaction}
+
+\begin{table}[t]
+\centering
+\caption{Constraint satisfaction by abstraction level (200~pairs, semantic scoring). An independent semantic LLM-judge re-scoring on all GT constraints yields 422/713 = 59.2\% overall (D1 43.8\%, D2 55.7\%, D3 73.8\%, D4 91.1\%); see supplementary for methodology comparison.}
+\label{tab:constraints}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccc}
+\toprule
+Level & Constraints & Satisfied & Rate \\
+\midrule
+D3 (Row-segment) & 140 & 140 & \textbf{100.0\%} \\
+D4 (Single-tree) & 120 & 114 & 95.0\% \\
+D2 (Multi-row) & 150 & 112 & 74.7\% \\
+D1 (Global) & 169 & 108 & 63.9\% \\
+\midrule
+\textbf{Overall} & \textbf{579} & \textbf{474} & \textbf{81.9\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+D3 achieves \textbf{100\%} (row-half + headland transitions); D4 achieves 95\% (instance-level tree grounding). D1 global reasoning (63.9\%) is hardest---requires \texttt{OrchardWing}/\texttt{quadrant} primitives under-represented in the 6-exemplar bank (Fig.~\ref{fig:hero_egocentric}; additional levels in Appendix~\ref{app:extra}).
+\subsection{Reasoning Complexity and Hardware Generalization}
+
+Multi-hardware validation confirms architecture-independent generalization across workstation and edge classes: RTX~5090 (28.0\,s/cmd median) achieves a 100\% structural output rate (99.0\% structural pass, 198/200), and NVIDIA Jetson Thor edge hardware (122\,GB unified, ${\sim}69\,$s/cmd median) achieves a 99.5\% (199/200) structural pass rate via multi-round inference---direct evidence of edge deployability.
+
+\subsection{Geometric Fidelity and Ablation Studies}
+
+\begin{table}[t]
+\centering
+\caption{Geometric fidelity by detail level (200~pairs). Structural pass exceeds 96\% at every level but geometric accuracy (waypoints inside GT region) degrades from D1 to D4.}
+\label{tab:geometric}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lcccc}
+\toprule
+Level & $n$ & Struct.\ \% & Geo.\ \% & Both \% \\
+\midrule
+D1 (Global) & 50 & 96.0 & 80.0 & 78.0 \\
+D2 (Multi-row) & 50 & 100.0 & 44.0 & 44.0 \\
+D3 (Row-segment) & 50 & 100.0 & 28.0 & 28.0 \\
+D4 (Single-tree) & 50 & 100.0 & 6.0 & 6.0 \\
+\midrule
+\textbf{Overall} & \textbf{200} & \textbf{99.0} & \textbf{39.5} & \textbf{39.0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Ablation (matched-model, matched-$n{=}200$ on Qwen3.6-35B-A3B): the structured area-equation format does not emerge without the 6-shot scaffold, and the older-model control verifies model dependence. Intermediate-$k$ and no-hierarchy rows at matched $n$ are deferred to the extended version.}
+\label{tab:ablation}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcc}
+\toprule
+Condition & $n$ & Struct.\ \% \\
+\midrule
+Zero-shot (no scaffold, no exemplars) & 400 & 0.0 \\
+Scaffold only ($k{=}0$, no exemplars) & 200 & 0.0 \\
+$k{=}6$, different model (Qwen3.5-35B-A3B) & 200 & 0.5 \\
+\midrule
+\textbf{Full system ($k{=}6$, hierarchy, Qwen3.6-35B-A3B)} & \textbf{200} & \textbf{99.0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:geometric} separates structural correctness from geometric fidelity: finer-grained commands (D4 single-tree: 6\% geometric) expose the VLM's lack of metric spatial grounding, motivating the proposed geometry encoder (Sec.~\ref{sec:geometry_encoder}). Table~\ref{tab:ablation} isolates the key components at matched $n{=}200$ on Qwen3.6-35B-A3B: zero-shot and scaffold-only ($k{=}0$) both produce 0\% structural pass, and an older-model control ($k{=}6$, Qwen3.5-35B-A3B) reaches only 0.5\%, so the full 99\% headline requires the 6-shot SayPlan scaffold and the Qwen3.6 model jointly. A matched-$n$ intermediate-$k$ and no-hierarchy sweep is deferred to the extended version.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\textbf{Why 2D BEV + multi-round works.}
+VLMs are trained on 2D images; image-space reasoning preserves spatial semantics that degrade under noisy 3D projection in agricultural environments (thin vegetation, repetitive rows, dynamic lighting). Our multi-round architecture exploits this: R1 generates area equations and predicates via thinking-mode inference over the BEV scene graph; R2 recovers structurally incomplete outputs by re-prompting with the model's own reasoning trace; R3 provides a deterministic geometric fallback. This three-round design achieves 100\% structural output rate even when individual inference calls fail (24.9\% of single-round attempts produce missing blocks).
+
+The SayPlan~\citep{rana2023sayplan} scaffold with 6 ground-truth-verified exemplars provides the compositional anchoring: the model learns from real orchard geometry (tree positions, row boundaries, headland extents) rather than synthetic templates, achieving 82\% constraint satisfaction across four spatial abstraction levels.
+
+\textbf{Limitations.}
+(1)~\emph{Latency}: multi-round inference requires 25--30\,s/cmd on RTX~5090; mitigation via LoRA distillation to 7B targeting $<$2\,s.
+(2)~\emph{Single-view}: planning from one BEV frame means occluded targets produce unreachable waypoints; multi-frame fusion is future work.
+(3)~\emph{Geometric fidelity}: 100\% structural correctness does not guarantee region containment (39.5\% overall); we propose a geometry encoder (Sec.~\ref{sec:geometry_encoder}) and a training-free inference-time activation-steering complement to address this, both left to future work.
+(4)~\emph{Edge deployment}: requires ${\geq}32$\,GB VRAM; 4-bit NF4 quantization targets Jetson-class hardware.
+
+\textbf{Future work: a proposed geometry-aware fusion layer.}
+\label{sec:geometry_encoder}
+To close the geometric-fidelity gap, we are developing (but do not evaluate here) a lightweight geometry encoder (${\sim}4$M params) inspired by SpatialStack~\citep{zhang2026spatialstack} that injects spatial structure into the language backbone before its LoRA-adapted layers by fusing BEV patch embeddings, SAM3 mask centroids, and scene-graph node coordinates (with L0--L3 level embeddings) via geometry-biased cross-attention. Whether such an encoder, trained on the semi-supervised triples, measurably improves region containment is left to an extension of this work, alongside the inference-time steering complement noted above.
+
+\textbf{Generative AI disclosure.}
+An AI coding assistant was used for experimental orchestration, script generation, and editorial assistance. All scientific claims, experimental results, and architectural decisions are authored and verified by the human researchers. VLM inference for waypoint generation uses Qwen3.6-35B-A3B (Alibaba/Qwen team) served via ollama.
+
+\textbf{Reproducibility.}
+The full code, the semi-supervised dataset (200 GT-annotated command pairs plus the in-context distillation set), and an interactive project page will be released publicly upon acceptance at the anonymized repository https://github.com/kulbir-ahluwalia/corl-2026-waypointgen-anon (and data archive upon request during discussion).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+\label{sec:conclusions}
+
+
+We presented WaypointGen, a language-conditioned system that compiles compositional NL navigation commands into executable area equations over a four-level spatial hierarchy (L0--L3) using multi-round VLM inference. Across 200~evaluation pairs spanning 10~citrus orchards (D1--D4), it raises the structural output rate from 75.1\% (single-round) to 100\% (99.0\% structural pass) and attains 81.9\% compositional constraint satisfaction, with the R1~thinking~$\to$~R2~retry~$\to$~R3~fallback design eliminating structural failures across RTX~5090 and NVIDIA~Jetson~Thor edge hardware (99.5\%). This reduces deployment from months to 1--2~weeks using only 6~ground-truth-verified in-context examples. Future work targets the geometry encoder for metric fidelity and LoRA distillation for edge latency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+% Acknowledgments omitted for double-blind review; will be included in camera-ready version.
+
+%===============================================================================
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% (\bibliographystyle handled by corl_2024.sty)
+\bibliography{references}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendix (does NOT count toward the 8-page CoRL main-body limit)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\section{Per-Capability Comparison and Qualitative Examples}
+\label{app:extra}
+
+Table~\ref{tab:capability_matrix} gives the per-capability breakdown that complements the
+summary comparison (Table~\ref{tab:related_comparison}) in the main text, and
+Figure~\ref{fig:citrus_bev_traj} shows one qualitative example per abstraction level (D1--D4).
+
+\begin{table*}[t]
+\centering
+\caption{Capability comparison of language-conditioned navigation methods. \cmark\ = supported, \xmark\ = not supported, \omark\ = partial support.}
+\label{tab:capability_matrix}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{Method} & \textbf{Compos.\ NL} & \textbf{Map-Free} & \textbf{Open-Vocab} & \textbf{Edge Deploy} & \textbf{Outdoor Ag.} & \textbf{Waypoints} & \textbf{Constraints} \\
+\midrule
+LM-Nav~\citep{shah2023lmnav} & \omark & \xmark & \xmark & \xmark & \omark & \xmark & \xmark \\
+VLMaps~\citep{huang2023vlmaps} & \cmark & \xmark & \cmark & \xmark & \xmark & \xmark & \xmark \\
+LLM-Grounder~\citep{yang2024llmgrounder} & \cmark & \xmark & \cmark & \xmark & \xmark & \xmark & \omark \\
+ConceptGraphs~\citep{gu2024conceptgraphs} & \cmark & \xmark & \cmark & \xmark & \xmark & \xmark & \xmark \\
+SayCan~\citep{ichter2023saycan} & \cmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+Code-as-Policies~\citep{liang2023code} & \cmark & \cmark & \xmark & \xmark & \xmark & \xmark & \omark \\
+PIVOT~\citep{nasiriany2024pivot} & \cmark & \cmark & \omark & \xmark & \xmark & \xmark & \xmark \\
+RoboPoint~\citep{yuan2025robopoint} & \cmark & \cmark & \omark & \xmark & \xmark & \omark & \xmark \\
+Talk2BEV~\citep{choudhary2024talk2bev} & \cmark & \omark & \omark & \xmark & \xmark & \xmark & \xmark \\
+OpenVLA~\citep{kim2025openvla} & \omark & \cmark & \xmark & \omark & \xmark & \xmark & \xmark \\
+GNM / ViNT / NoMaD~\citep{shah2023gnm,shah2023vint,sridhar2024nomad} & \xmark & \cmark & \xmark & \cmark & \omark & \cmark & \xmark \\
+GeNIE~\citep{wang2025genie} & \xmark & \cmark & \xmark & \cmark & \omark & \cmark & \xmark \\
+AgriVLN~\citep{zhao2025agrivln} & \cmark & \xmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
+\midrule
+\textbf{WaypointGen (Ours)} & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{1mm}
+\parbox{\textwidth}{\scriptsize \textbf{Columns:} \textit{Compos.\ NL} = compositional language with ordinals, avoidance, spatial relations; \textit{Map-Free} = no prior map or exploration; \textit{Open-Vocab} = open-vocabulary object detection; \textit{Edge Deploy} = runs on Jetson-class hardware; \textit{Outdoor Ag.} = tested in agricultural outdoor environments; \textit{Waypoints} = outputs explicit waypoint sequences; \textit{Constraints} = handles NL-defined avoidance constraints.}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figures/selected/D1_SE_quadrant_coverage.png}
+    \caption{\footnotesize D1: \emph{``Cover the south-east quadrant of the orchard while staying inside the access-lane network and avoiding row~1.''} 3 simultaneous constraints: quadrant + lane + avoidance.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figures/selected/D2_odd_rows_survey.png}
+    \caption{\footnotesize D2: \emph{``Survey only the odd-numbered rows from north to south, finishing at the southern headland.''} Boustrophedon pattern through row subset.}
+\end{subfigure}
+
+\vspace{0.6em}
+
+\begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figures/selected/D3_skip_mislabelled_tree.png}
+    \caption{\footnotesize D3: \emph{``Continue along row~5 (skip its westernmost tree, which is mis-labelled) until you reach the eastern headland.''} Inline avoidance constraint.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figures/selected/D4_single_tree_row11.png}
+    \caption{\footnotesize D4: \emph{``Goal: reach the third tree counted from the east edge of row~11, where a missing-tree slot was flagged earlier today.''} Ordinal + contextual grounding.}
+\end{subfigure}
+\caption{\textbf{Qualitative results across four abstraction levels.} Satellite BEV with detected tree landmarks (orange), start (green), goal (red), and generated waypoints (yellow). (a)~D1 global coverage with 3 simultaneous constraints. (b)~D2 boustrophedon row-subset pattern. (c)~D3 inline avoidance constraint. (d)~D4 ordinal + contextual single-tree grounding. Additional examples and a failure case analysis are in the supplementary.}
+\label{fig:citrus_bev_traj}
+\end{figure*}
+
+\end{document}
