@@ -1,0 +1,28 @@
+{
+  "repo": "corl-2026-waypointgen-anon",
+  "github": "<owner>/corl-2026-waypointgen-anon",
+  "kind": "artifact-frozen",
+  "status": "frozen",
+  "lane": 1,
+  "visibility": "public",
+  "anonymous": true,
+  "default_branch": "main",
+  "overleaf_synced": false,
+  "main_tex": "v1.11/CoRL_2026_WayPoint_Gen_v1.11.tex",
+  "bib": ["references.bib"],
+  "doc_class": "corl_2026",
+  "build": {"cmd": null, "passes": []},
+  "gate": {"warn_pages": null, "max_pages": null, "body_end_label": null, "refs_start_label": null, "min_spare_pt": null},
+  "protected_globs": [
+    "v1.11/**",
+    "v1.18_submitted/**",
+    "CoRL_2026_WayPoint_Gen_v1.11.*",
+    "waypointgen_supplementary_v1.11.*"
+  ],
+  "dead_paths": [],
+  "tracked_build_outputs": [],
+  "placeholder_generators": [],
+  "hardcoded_fleet_paths": [],
+  "related_repos": [],
+  "notes": "Frozen public anonymous review artifact for the CoRL 2026 WaypointGen submission: v1.11 paper and supplement (tex/pdf/md, also duplicated at the root) and the v1.18 submitted paper PDF/md, supplement tex/pdf/md and final abstract. Sources are not self-contained (the corl_2026 style, references.bib, figures and three supplement table inputs are not included), so nothing is built here; main_tex and bib record what the v1.11 source declares. Do not edit submitted files and do not add identifying information."
+}
